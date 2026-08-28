@@ -1,7 +1,5 @@
 import {
 	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
 	Modal,
 	Notice,
 	Plugin,
@@ -11,7 +9,7 @@ import {
 	MyPluginSettings,
 	SampleSettingTab,
 } from './settings';
-import { deleteCurrentSection, openSectionPicker } from './heading';
+import { deleteCurrentHeading, openHeadingPicker } from './heading';
 
 // Remember to rename these classes and interfaces!
 
@@ -33,7 +31,6 @@ export default class HeadingDeletePlugin extends Plugin {
 			name: 'Delete current heading',
 			editorCallback: (
 				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
 			) => {
 				const currentFile = this.app.workspace.getActiveFile();
 				if (currentFile == null) {
@@ -42,7 +39,7 @@ export default class HeadingDeletePlugin extends Plugin {
 				}
 
 				const context = this.app.metadataCache.getFileCache(currentFile);
-				deleteCurrentSection(editor, context?.headings);
+				deleteCurrentHeading(editor, context?.headings);
 			},
 		});
 		// this.addCommand({

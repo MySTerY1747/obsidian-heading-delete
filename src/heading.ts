@@ -30,7 +30,7 @@ function getNextHeading(currentHeading: HeadingCache, headings: HeadingCache[]):
 	return nextHeading;
 }
 
-export function deleteCurrentSection(editor: Editor, headings: HeadingCache[] | undefined) {
+export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | undefined) {
 
 	if (headings === undefined) {
 		new Notice('No headings found in current file');
@@ -55,6 +55,6 @@ export function deleteCurrentSection(editor: Editor, headings: HeadingCache[] | 
 	editor.replaceRange("", deleteFrom, deleteTo);
 }
 
-export function openSectionPicker(app: App, editor: Editor, headings: HeadingCache[] | undefined) {
+export function openHeadingPicker(app: App, editor: Editor, headings: HeadingCache[] | undefined) {
 	// pass
 }
