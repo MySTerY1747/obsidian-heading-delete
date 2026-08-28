@@ -7,43 +7,41 @@ function locToEditorPosition(loc: Loc): EditorPosition {
 	}
 }
 
-function getCurrentHeading(headings: HeadingCache[], currentLine: number): HeadingCache {
-	return headings.reduce((currentBest, next) => {
-		if (next.position.start.line > currentLine) return currentBest;
-		if (currentBest === undefined || next.position.start.line > currentBest.position.start.line) return next;
-		return currentBest;
-	})
+function getCurrentHeading(headings: HeadingCache[] | undefined, currentLine: number): HeadingCache | null {
+	if (headings === undefined) {
+		return null;
+	}
+
+	var currentClosestHeading: HeadingCache | null = null;
+	for (const heading of headings) {
+		if (heading.position.start.line > currentLine) break;
+		currentClosestHeading = heading;
+	}
+	return currentClosestHeading
 }
 
 function getNextHeading(currentHeading: HeadingCache, headings: HeadingCache[]): HeadingCache | null {
-	let passedCurrent = false;
 	let nextHeading: HeadingCache | null = null;
-
 	for (const heading of headings) {
-		if (!passedCurrent) {
-			if (heading != currentHeading) continue
-			else {
-				passedCurrent = true;
-				continue;
-			}
-		}
-
-		if (heading.level <= currentHeading.level) {
-			nextHeading = heading;
-			break;
+		if (heading.position.start.line > currentHeading.position.start.line && heading.level <= currentHeading.level) {
+			return heading;
 		}
 	}
-
 	return nextHeading;
 }
 
 export function deleteCurrentSection(editor: Editor, headings: HeadingCache[] | undefined) {
-	if (!headings) {
+
+	if (headings === undefined) {
 		new Notice('No headings found in current file');
 		return;
 	}
 
-	const currentHeading = getCurrentHeading(headings, editor.getCursor().line);
+	var currentHeading = getCurrentHeading(headings, editor.getCursor().line);
+	if (!currentHeading) {
+		return;
+	}
+
 	const nextHeading = getNextHeading(currentHeading, headings);
 
 	const deleteFrom = locToEditorPosition(currentHeading.position.start);
@@ -51,7 +49,7 @@ export function deleteCurrentSection(editor: Editor, headings: HeadingCache[] | 
 		? locToEditorPosition(nextHeading.position.start)
 		: {
 			ch: 0,
-			line: editor.lastLine()
+			line: editor.lastLine() + 1
 		};
 
 	editor.replaceRange("", deleteFrom, deleteTo);

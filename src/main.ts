@@ -35,18 +35,14 @@ export default class HeadingDeletePlugin extends Plugin {
 				editor: Editor,
 				_ctx: MarkdownView | MarkdownFileInfo,
 			) => {
-				const view = this.app.workspace.getActiveViewOfType(MarkdownView)
-				if (!view) {
-					new Notice("Error: no active view found")
-				}
-				const currentFile = this.app.workspace.getActiveFile()
+				const currentFile = this.app.workspace.getActiveFile();
 				if (currentFile == null) {
-					new Notice('Error: no active file found.')
-					return
+					new Notice('Error: no active file found.');
+					return;
 				}
 
-				const context = this.app.metadataCache.getFileCache(currentFile)
-				deleteCurrentSection(editor, context?.headings)
+				const context = this.app.metadataCache.getFileCache(currentFile);
+				deleteCurrentSection(editor, context?.headings);
 			},
 		});
 		// this.addCommand({
