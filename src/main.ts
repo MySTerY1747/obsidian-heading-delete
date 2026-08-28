@@ -21,12 +21,12 @@ export default class HeadingDeletePlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
-			const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-			if (view) {
-				deleteCurrentSection(view.editor);
-			}
-		});
+		// this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
+		// 	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		// 	if (view) {
+		// 		deleteCurrentSection(view.editor);
+		// 	}
+		// });
 
 		this.addCommand({
 			id: 'delete-current-heading',
@@ -35,32 +35,35 @@ export default class HeadingDeletePlugin extends Plugin {
 				editor: Editor,
 				_ctx: MarkdownView | MarkdownFileInfo,
 			) => {
-				if (this.app.workspace.getActiveViewOfType(MarkdownView)) {
-					deleteCurrentSection(editor);
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView)
+				if (!view) {
+					new Notice("Error: no active view found")
 				}
+				const currentFile = this.app.workspace.getActiveFile()
+				if (currentFile == null) {
+					new Notice('Error: no active file found.')
+					return
+				}
+
+				const context = this.app.metadataCache.getFileCache(currentFile)
+				deleteCurrentSection(editor, context?.headings)
 			},
 		});
-		this.addCommand({
-			id: 'delete-a-heading',
-			name: 'Delete a heading (list)',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				if (this.app.workspace.getActiveViewOfType(MarkdownView)) {
-					openSectionPicker(this.app, editor)
-				}
-			},
-		});
+		// this.addCommand({
+		// 	id: 'delete-a-heading',
+		// 	name: 'Delete a heading (list)',
+		// 	editorCallback: (
+		// 		editor: Editor,
+		// 		_ctx: MarkdownView | MarkdownFileInfo,
+		// 	) => {
+		// 		if (this.app.workspace.getActiveViewOfType(MarkdownView)) {
+		// 			openSectionPicker(this.app, editor)
+		// 		}
+		// 	},
+		// });
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(
