@@ -3,6 +3,7 @@ import {
 	Modal,
 	Notice,
 	Plugin,
+	MarkdownView
 } from 'obsidian';
 import {
 	DEFAULT_SETTINGS,
@@ -11,20 +12,27 @@ import {
 } from './settings';
 import { deleteCurrentHeading, openHeadingPicker } from './heading';
 
-// Remember to rename these classes and interfaces!
-
 export default class HeadingDeletePlugin extends Plugin {
 	settings!: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
 
-		// this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
-		// 	const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		// 	if (view) {
-		// 		deleteCurrentSection(view.editor);
-		// 	}
-		// });
+		this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
+			const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+			if (view == null) {
+				new Notice('Error: no active view found.');
+				return;
+			}
+			const currentFile = this.app.workspace.getActiveFile();
+			if (currentFile == null) {
+				new Notice('Error: no active file found.');
+				return;
+			}
+
+			const context = this.app.metadataCache.getFileCache(currentFile);
+			deleteCurrentHeading(view.editor, context?.headings);
+		});
 
 		this.addCommand({
 			id: 'delete-current-heading',

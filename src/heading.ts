@@ -1,18 +1,18 @@
 import { App, Editor, EditorPosition, HeadingCache, Loc, Notice } from "obsidian";
 
-function locToEditorPosition(loc: Loc): EditorPosition {
+export function locToEditorPosition(loc: Loc): EditorPosition {
 	return {
 		ch: loc.col,
 		line: loc.line,
 	}
 }
 
-function getCurrentHeading(headings: HeadingCache[] | undefined, currentLine: number): HeadingCache | null {
+export function getCurrentHeading(headings: HeadingCache[] | undefined, currentLine: number): HeadingCache | null {
 	if (headings === undefined) {
 		return null;
 	}
 
-	var currentClosestHeading: HeadingCache | null = null;
+	let currentClosestHeading: HeadingCache | null = null;
 	for (const heading of headings) {
 		if (heading.position.start.line > currentLine) break;
 		currentClosestHeading = heading;
@@ -20,14 +20,13 @@ function getCurrentHeading(headings: HeadingCache[] | undefined, currentLine: nu
 	return currentClosestHeading
 }
 
-function getNextHeading(currentHeading: HeadingCache, headings: HeadingCache[]): HeadingCache | null {
-	let nextHeading: HeadingCache | null = null;
+export function getNextHeading(currentHeading: HeadingCache, headings: HeadingCache[]): HeadingCache | null {
 	for (const heading of headings) {
 		if (heading.position.start.line > currentHeading.position.start.line && heading.level <= currentHeading.level) {
 			return heading;
 		}
 	}
-	return nextHeading;
+	return null;
 }
 
 export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | undefined) {
@@ -37,8 +36,9 @@ export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | 
 		return;
 	}
 
-	var currentHeading = getCurrentHeading(headings, editor.getCursor().line);
+	let currentHeading = getCurrentHeading(headings, editor.getCursor().line);
 	if (!currentHeading) {
+		new Notice('No heading found in before cursor');
 		return;
 	}
 
