@@ -112,6 +112,9 @@ describe('locToEditorPosition', () => {
 	});
 });
 
+beforeEach(() => {
+	jest.clearAllMocks();
+});
 describe('deleteCurrentHeading', () => {
 	test('deletes through next same/parent heading', () => {
 		const editor = makeEditor(6, 30);
@@ -151,7 +154,7 @@ describe('deleteCurrentHeading', () => {
 		deleteCurrentHeading(editor as unknown as Editor, []);
 
 		expect(editor.replaceRange).not.toHaveBeenCalled()
-		expect(Notice).toHaveBeenCalled()
+		expect(Notice).toHaveBeenCalledWith('No heading found before cursor',)
 	});
 });
 
