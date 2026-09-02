@@ -1,6 +1,7 @@
-import type { Editor, HeadingCache, Loc, } from 'obsidian';
+import type { App, Editor, HeadingCache, Loc } from 'obsidian';
 import { Notice } from 'obsidian';
-import { locToEditorPosition, getCurrentHeading, getNextHeading, deleteCurrentHeading } from '../src/heading'
+import { locToEditorPosition, getCurrentHeading, getNextHeading, deleteCurrentHeading, deleteAHeading } from '../src/heading'
+import { HeadingPicker } from "../src/main.ts"
 
 jest.mock('obsidian');
 
@@ -42,9 +43,6 @@ function makeEditor(cursorLine: number, lastLine: number) {
 		replaceRange: jest.fn(),
 	};
 }
-
-
-
 
 describe('getCurrentHeading', () => {
 	test('returns null when headings is undefined', () => {
@@ -112,6 +110,21 @@ describe('locToEditorPosition', () => {
 	});
 });
 
+describe('deleteAHeading', () => {
+	test('deletes correct heading', () => {
+		const editor = makeEditor(6, 30);
+
+		deleteAHeading(editor as unknown as Editor, headings[1], headings);
+
+		expect(editor.replaceRange).toHaveBeenCalledWith(
+			'',
+			{ line: 5, ch: 0 },
+			{ line: 15, ch: 0 },
+		);
+	});
+});
+
+
 beforeEach(() => {
 	jest.clearAllMocks();
 });
@@ -144,7 +157,7 @@ describe('deleteCurrentHeading', () => {
 
 		deleteCurrentHeading(editor as unknown as Editor, []);
 
-		expect(editor.replaceRange).not.toHaveBeenCalled()
+		expect(editor.replaceRange).not.toHaveBeenCalled();
 	});
 
 
@@ -153,8 +166,37 @@ describe('deleteCurrentHeading', () => {
 
 		deleteCurrentHeading(editor as unknown as Editor, []);
 
-		expect(editor.replaceRange).not.toHaveBeenCalled()
-		expect(Notice).toHaveBeenCalledWith('No heading found before cursor',)
+		expect(editor.replaceRange).not.toHaveBeenCalled();
+		expect(Notice).toHaveBeenCalledWith('No heading found before cursor',);
+	});
+});
+
+describe('HeadingPicker', () => {
+	test('getItems returns headings', () => {
+		const editor = makeEditor(6, 30);
+		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
+
+		expect(headingPicker.getItems() == headings);
+	});
+
+	test('getItemText returns level + name', () => {
+		const editor = makeEditor(6, 30);
+		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
+
+		expect(headingPicker.getItemText(headings[0]) == "# Heading");
+	});
+
+
+	test('onChooseItem deletes heading', () => {
+		const editor = makeEditor(6, 30);
+		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
+
+		headingPicker.onChooseItem(headings[1]);
+		expect(editor.replaceRange).toHaveBeenCalledWith(
+			'',
+			{ line: 5, ch: 0 },
+			{ line: 15, ch: 0 },
+		);
 	});
 });
 

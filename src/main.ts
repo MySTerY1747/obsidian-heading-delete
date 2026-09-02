@@ -14,6 +14,7 @@ import {
 import { deleteAHeading, deleteCurrentHeading } from './heading';
 
 export default class HeadingDeletePlugin extends Plugin {
+	// TODO: Add functionality to check if keybinding cmd + shift + d is available, and if so, bind `delete-current-heading` to it.
 	settings!: MyPluginSettings;
 
 	async onload() {
