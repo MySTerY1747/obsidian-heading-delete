@@ -1,7 +1,7 @@
 import type { App, Editor, HeadingCache, Loc } from 'obsidian';
 import { Notice } from 'obsidian';
 import { locToEditorPosition, getCurrentHeading, getNextHeading, deleteCurrentHeading, deleteAHeading } from '../src/heading'
-import { HeadingPicker } from "../src/main.ts"
+import { HeadingPicker } from "../src/main"
 
 jest.mock('obsidian');
 
@@ -52,7 +52,7 @@ describe('getCurrentHeading', () => {
 	});
 
 	test('returns null when headings is empty', () => {
-		const empty_headings = [];
+		const empty_headings: HeadingCache[] = [];
 		const result = getCurrentHeading(empty_headings, 1);
 		expect(result).toBe(null);
 	});
@@ -74,21 +74,21 @@ describe('getCurrentHeading', () => {
 
 describe('getNextHeading', () => {
 	test('returns next heading of same level', () => {
-		const result = getNextHeading(headings[0], headings);
+		const result = getNextHeading(headings[0]!, headings);
 		expect(result).toBe(headings[4]);
 	});
 	test('skips deeper headings', () => {
-		const result = getNextHeading(headings[1], headings);
+		const result = getNextHeading(headings[1]!, headings);
 		expect(result).toBe(headings[3]);
 	});
 
 	test('returns next heading of higher level', () => {
-		const result = getNextHeading(headings[2], headings);
+		const result = getNextHeading(headings[2]!, headings);
 		expect(result).toBe(headings[3]);
 	});
 
 	test('returns null when there is no next relevant heading', () => {
-		const result = getNextHeading(headings[4], headings);
+		const result = getNextHeading(headings[4]!, headings);
 		expect(result).toBe(null);
 	});
 });
@@ -114,7 +114,7 @@ describe('deleteAHeading', () => {
 	test('deletes correct heading', () => {
 		const editor = makeEditor(6, 30);
 
-		deleteAHeading(editor as unknown as Editor, headings[1], headings);
+		deleteAHeading(editor as unknown as Editor, headings[1]!, headings);
 
 		expect(editor.replaceRange).toHaveBeenCalledWith(
 			'',
@@ -167,7 +167,7 @@ describe('deleteCurrentHeading', () => {
 		deleteCurrentHeading(editor as unknown as Editor, []);
 
 		expect(editor.replaceRange).not.toHaveBeenCalled();
-		expect(Notice).toHaveBeenCalledWith('No heading found before cursor',);
+		expect(Notice).toHaveBeenCalledWith('No heading found before Cursor',);
 	});
 });
 
@@ -183,7 +183,7 @@ describe('HeadingPicker', () => {
 		const editor = makeEditor(6, 30);
 		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
 
-		expect(headingPicker.getItemText(headings[0])).toBe("# Heading 2");
+		expect(headingPicker.getItemText(headings[0]!)).toBe("# Heading 2");
 	});
 
 
@@ -191,7 +191,7 @@ describe('HeadingPicker', () => {
 		const editor = makeEditor(6, 30);
 		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
 
-		headingPicker.onChooseItem(headings[1]);
+		headingPicker.onChooseItem(headings[1]!);
 		expect(editor.replaceRange).toHaveBeenCalledWith(
 			'',
 			{ line: 5, ch: 0 },
