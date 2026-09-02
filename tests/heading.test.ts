@@ -176,14 +176,14 @@ describe('HeadingPicker', () => {
 		const editor = makeEditor(6, 30);
 		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
 
-		expect(headingPicker.getItems() == headings);
+		expect(headingPicker.getItems()).toBe(headings);
 	});
 
 	test('getItemText returns level + name', () => {
 		const editor = makeEditor(6, 30);
 		const headingPicker = new HeadingPicker({} as App, editor as unknown as Editor, headings);
 
-		expect(headingPicker.getItemText(headings[0]) == "# Heading");
+		expect(headingPicker.getItemText(headings[0])).toBe("# Heading 2");
 	});
 
 
