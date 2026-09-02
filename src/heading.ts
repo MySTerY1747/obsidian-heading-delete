@@ -1,4 +1,4 @@
-import { App, Editor, EditorPosition, HeadingCache, Loc, Notice } from "obsidian";
+import { Editor, EditorPosition, HeadingCache, Loc, Notice } from "obsidian";
 
 export function locToEditorPosition(loc: Loc): EditorPosition {
 	return {
@@ -29,6 +29,21 @@ export function getNextHeading(currentHeading: HeadingCache, headings: HeadingCa
 	return null;
 }
 
+export function deleteAHeading(editor: Editor, heading: HeadingCache, headings: HeadingCache[]) {
+
+	const nextHeading = getNextHeading(heading, headings);
+
+	const deleteFrom = locToEditorPosition(heading.position.start);
+	const deleteTo = nextHeading
+		? locToEditorPosition(nextHeading.position.start)
+		: {
+			ch: 0,
+			line: editor.lastLine() + 1
+		};
+
+	editor.replaceRange("", deleteFrom, deleteTo);
+}
+
 export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | undefined) {
 
 	if (headings === undefined) {
@@ -42,19 +57,5 @@ export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | 
 		return;
 	}
 
-	const nextHeading = getNextHeading(currentHeading, headings);
-
-	const deleteFrom = locToEditorPosition(currentHeading.position.start);
-	const deleteTo = nextHeading
-		? locToEditorPosition(nextHeading.position.start)
-		: {
-			ch: 0,
-			line: editor.lastLine() + 1
-		};
-
-	editor.replaceRange("", deleteFrom, deleteTo);
-}
-
-export function openHeadingPicker(app: App, editor: Editor, headings: HeadingCache[] | undefined) {
-	// pass
+	deleteAHeading(editor, currentHeading, headings);
 }

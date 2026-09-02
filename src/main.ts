@@ -1,16 +1,17 @@
 import {
 	Editor,
-	Modal,
+	App,
 	Notice,
 	Plugin,
-	MarkdownView
+	MarkdownView,
+	FuzzySuggestModal,
+	HeadingCache
 } from 'obsidian';
 import {
 	DEFAULT_SETTINGS,
 	MyPluginSettings,
-	SampleSettingTab,
 } from './settings';
-import { deleteCurrentHeading, openHeadingPicker } from './heading';
+import { deleteAHeading, deleteCurrentHeading } from './heading';
 
 export default class HeadingDeletePlugin extends Plugin {
 	settings!: MyPluginSettings;
@@ -50,26 +51,26 @@ export default class HeadingDeletePlugin extends Plugin {
 				deleteCurrentHeading(editor, context?.headings);
 			},
 		});
-		// this.addCommand({
-		// 	id: 'delete-a-heading',
-		// 	name: 'Delete a heading (list)',
-		// 	editorCallback: (
-		// 		editor: Editor,
-		// 		_ctx: MarkdownView | MarkdownFileInfo,
-		// 	) => {
-		// 		if (this.app.workspace.getActiveViewOfType(MarkdownView)) {
-		// 			openSectionPicker(this.app, editor)
-		// 		}
-		// 	},
-		// });
+		this.addCommand({
+			id: 'delete-a-heading',
+			name: 'Delete a heading',
+			editorCallback: (
+				editor: Editor,
+			) => {
+				const currentFile = this.app.workspace.getActiveFile();
+				if (currentFile == null) {
+					new Notice('Error: no active file found.');
+					return;
+				}
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
+				const context = this.app.metadataCache.getFileCache(currentFile);
+				if (context?.headings == undefined) {
+					return;
+				}
+				new HeadingPicker(this.app, editor, context.headings).open();
+			},
+		});
 	}
 
 	onunload() { }
@@ -87,14 +88,26 @@ export default class HeadingDeletePlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
+export class HeadingPicker extends FuzzySuggestModal<HeadingCache> {
+	private editor: Editor;
+	private headings: HeadingCache[];
+
+	constructor(app: App, editor: Editor, headings: HeadingCache[]) {
+		super(app);
+		this.setTitle('Headings');
+		this.editor = editor;
+		this.headings = headings;
 	}
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
+	getItems(): HeadingCache[] {
+		return this.headings;
+	}
+
+	getItemText(heading: HeadingCache): string {
+		return "#".repeat(heading.level) + " " + heading.heading;
+	}
+
+	onChooseItem(heading: HeadingCache) {
+		deleteAHeading(this.editor, heading, this.headings)
 	}
 }
