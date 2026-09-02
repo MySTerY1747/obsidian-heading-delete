@@ -7,18 +7,11 @@ import {
 	FuzzySuggestModal,
 	HeadingCache
 } from 'obsidian';
-import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-} from './settings';
 import { deleteAHeading, deleteCurrentHeading } from './heading';
 
 export default class HeadingDeletePlugin extends Plugin {
-	// TODO: Add functionality to check if keybinding cmd + shift + d is available, and if so, bind `delete-current-heading` to it.
-	settings!: MyPluginSettings;
 
 	async onload() {
-		await this.loadSettings();
 
 		this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView);
@@ -72,20 +65,6 @@ export default class HeadingDeletePlugin extends Plugin {
 				new HeadingPicker(this.app, editor, context.headings).open();
 			},
 		});
-	}
-
-	onunload() { }
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
 
