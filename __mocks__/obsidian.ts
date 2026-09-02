@@ -26,4 +26,4 @@ export class Setting { }
 export class App { }
 export class MarkdownView { }
 export class Editor { }
-export class FuzzySuggestModal { setTitle(title: String) { title } }
+export class FuzzySuggestModal { setTitle(title: string) { title } }
