@@ -13,7 +13,7 @@ export default class HeadingDeletePlugin extends Plugin {
 
 	async onload() {
 
-		this.addRibbonIcon('trash', 'Delete Heading', (_evt: MouseEvent) => {
+		this.addRibbonIcon('trash', 'Delete heading', (_evt: MouseEvent) => {
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 			if (view == null) {
 				new Notice('Error: no active view found.');

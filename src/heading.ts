@@ -53,7 +53,7 @@ export function deleteCurrentHeading(editor: Editor, headings: HeadingCache[] | 
 
 	let currentHeading = getCurrentHeading(headings, editor.getCursor().line);
 	if (!currentHeading) {
-		new Notice('No heading found before cursor');
+		new Notice('No heading found before Cursor');
 		return;
 	}
 
