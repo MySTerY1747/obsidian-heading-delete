@@ -1,7 +1,7 @@
 {
 	"id": "heading-delete",
 	"name": "Heading Delete",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"minAppVersion": "1.8.0",
 	"description": "Delete headings and their entire sections using commands or shortcuts.",
 	"author": "MySTerY1747",
